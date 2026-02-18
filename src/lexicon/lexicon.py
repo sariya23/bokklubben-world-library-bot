@@ -14,9 +14,9 @@ class LexiconRu:
 используйте кнопку Меню слева от поля ввода сообщения"""
     UnknownCommand = Text("❌", Bold('Я не знаю такой команды')).as_kwargs()
     InternalError = Text("❌", Bold('Внутренняя ошибка')).as_kwargs()
-    BackPagination = "<<"
-    ForwardPagination = ">>"
-    ToMenuButton = "В меню"
+    BackPagination = "⏪"
+    ForwardPagination = "⏩"
+    ToMenuButton = "📖 В меню"
 
 @dataclass
 class Command:

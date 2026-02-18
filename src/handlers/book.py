@@ -37,9 +37,9 @@ def create_router(book_service: BookService) -> Router:
         elements = [f"{book.author} — {book.title}" for book in chunk]
         content = as_list(
             as_marked_section(
-                Bold(f"Список книг (стр. {page + 1} из {total_pages})"),
+                Bold("📚", "Список книг\n"),
                 *elements,
-                marker="- ",
+                marker="📕",
             )
         )
         keyboard = create_pagination_book_keyboard(page, total_pages, PAGE_SIZE_SHOW_ALL_BOOKS * page, len(books))
