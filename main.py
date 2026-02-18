@@ -1,5 +1,5 @@
-from config.config import create_config
-from parse_args import parse_args
+from src.config.config import create_config
+from src.parse_args import parse_args
 
 def main():
     args = parse_args()
