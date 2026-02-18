@@ -1,6 +1,6 @@
 from src.config.config import create_config
 from src.parse_args import parse_args
-from src.handlers import user, other
+from src.handlers import user, other, base
 from aiogram import Bot, Dispatcher
 from src.keyboards.menu_commands import set_main_menu
 from src.handlers import book
@@ -30,12 +30,14 @@ async def main():
     user_router = user.create_router()
     other_router = other.create_router()
     book_router = book.create_router(book_service)
+    base_router = base.create_router()
     
     await set_main_menu(bot)
     
     disp.include_router(user_router)
     disp.include_router(other_router)
     disp.include_router(book_router)
+    disp.include_router(base_router)
     
     await bot.delete_webhook(drop_pending_updates=True)
     await disp.start_polling(bot)
