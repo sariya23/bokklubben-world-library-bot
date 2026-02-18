@@ -1,5 +1,6 @@
 from src.config.config import create_config
 from src.parse_args import parse_args
+from src.handlers import user, other
 from aiogram import Bot, Dispatcher
 
 import logging
@@ -19,9 +20,11 @@ async def main():
     logging.info(f"env type: {config.env_type.env_type}")
     
     bot = Bot(token=config.bot.bot_token)
-    dp = Dispatcher()
+    disp = Dispatcher()
+    disp.include_router(user.router)
+    disp.include_router(other.router)
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+    await disp.start_polling(bot)
 
 
 if __name__ == "__main__":
