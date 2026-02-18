@@ -2,6 +2,7 @@ from src.config.config import create_config
 from src.parse_args import parse_args
 from src.handlers import user, other
 from aiogram import Bot, Dispatcher
+from src.service.book.book import BookService
 
 import logging
 import asyncio
@@ -21,8 +22,11 @@ async def main():
     
     bot = Bot(token=config.bot.bot_token)
     disp = Dispatcher()
-    disp.include_router(user.router)
-    disp.include_router(other.router)
+    
+    user_router = user.create_router()
+    other_router = other.create_router()
+    disp.include_router(user_router)
+    disp.include_router(other_router)
     await bot.delete_webhook(drop_pending_updates=True)
     await disp.start_polling(bot)
 
