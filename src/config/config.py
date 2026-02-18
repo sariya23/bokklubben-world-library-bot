@@ -13,11 +13,16 @@ class DbConfig:
     db_host: str
     db_use_ssl: bool
 
+@dataclass
+class EnvConfig:
+    env_type: str
+
 
 @dataclass
 class Config:
     bot: BotConfig
     db: DbConfig
+    env_type: EnvConfig
 
 
 def create_config(config_path: str) -> Config:
@@ -34,5 +39,8 @@ def create_config(config_path: str) -> Config:
             db_password=env.str("DB_PASSWORD"),
             db_host=env.str("DB_HOST"),
             db_use_ssl=env.bool("DB_USE_SSL"),
+        ),
+        env_type=EnvConfig(
+            env_type=env.str("ENV_TYPE"),
         ),
     )
