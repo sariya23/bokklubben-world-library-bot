@@ -15,6 +15,6 @@ def create_router() -> Router:
         
     @router.message(Command(commands="help"))
     async def process_help_command(message: Message):
-        await message.answer(**LexiconRu.HelpCommand)
+        await message.answer(LexiconRu.HelpCommand)
     
     return router

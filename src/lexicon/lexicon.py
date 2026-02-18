@@ -1,4 +1,5 @@
-from aiogram.utils.formatting import Bold, Text, TextLink, as_list, as_marked_section
+from aiogram.utils.formatting import Bold, Text, TextLink
+from dataclasses import dataclass
 
 class LexiconRu:
     StartCommand = Text("📚",
@@ -9,11 +10,20 @@ class LexiconRu:
                         "и ничего не упустить",
                         "\n", "\n",
                         "Для просмотра списка доступных команд используйте команду /help").as_kwargs()
-    HelpCommand = as_list(as_marked_section(
-        Bold("Доступные команды:\n"),
-        "/start - Начать работу с ботом"
-        "/help - Посмотреть список доступных команд",
-        marker="⚒️"
-    )).as_kwargs()
+    HelpCommand = """Для повторного вызова начального сообщения используйте команду /start. Для просмотра всего списка команд
+используйте кнопку Меню слева от поля ввода сообщения"""
     UnknownCommand = Text("❌", Bold('Я не знаю такой команды')).as_kwargs()
     InternalError = Text("❌", Bold('Внутренняя ошибка')).as_kwargs()
+
+@dataclass
+class Command:
+    command: str
+    description: str
+
+class LexiconCommands:
+    StartCommand = Command("/start", "Начать работу с ботом")
+    HelpCommand = Command("/help", "Если непонятно что делать")
+    __commands = [StartCommand, HelpCommand]
+    
+    def get_commands(self) -> list[Command]:
+        return self.__commands

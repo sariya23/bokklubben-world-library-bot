@@ -2,7 +2,7 @@ from src.config.config import create_config
 from src.parse_args import parse_args
 from src.handlers import user, other
 from aiogram import Bot, Dispatcher
-from src.service.book.book import BookService
+from src.keyboards.menu_commands import set_main_menu
 
 import logging
 import asyncio
@@ -25,6 +25,9 @@ async def main():
     
     user_router = user.create_router()
     other_router = other.create_router()
+    
+    await set_main_menu(bot)
+    
     disp.include_router(user_router)
     disp.include_router(other_router)
     await bot.delete_webhook(drop_pending_updates=True)
