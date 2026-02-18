@@ -10,6 +10,6 @@ router = Router()
 @router.message()
 async def send_echo(message: Message):
     try:
-        await message.answer(**LexiconRu.UnknownCommand.as_kwargs())
+        await message.answer(**LexiconRu.UnknownCommand)
     except TypeError:
-        await message.answer(**LexiconRu.InternalError.as_kwargs())
+        await message.answer(**LexiconRu.InternalError)
