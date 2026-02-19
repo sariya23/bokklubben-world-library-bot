@@ -2,18 +2,26 @@ from aiogram.utils.formatting import Bold, Text, TextLink
 from dataclasses import dataclass
 from typing import Any
 from src.domain.profile import Profile
+from aiogram.utils.formatting import as_list
 from src.domain.book import Book
 class LexiconRu:
-    StartCommand = Text("📚",
-                        Bold('Всемирная библиотека'),
+    StartCommand = Text("Привет! 👋",
                         "\n", "\n",
-                        "Этот бот поможет прочитать книги из ", 
-                        TextLink("Всемирной библиотеки ", url="https://knigi.fandom.com/ru/wiki/%D0%92%D1%81%D0%B5%D0%BC%D0%B8%D1%80%D0%BD%D0%B0%D1%8F_%D0%B1%D0%B8%D0%B1%D0%BB%D0%B8%D0%BE%D1%82%D0%B5%D0%BA%D0%B0_(%D0%9D%D0%BE%D1%80%D0%B2%D0%B5%D0%B6%D1%81%D0%BA%D0%B8%D0%B9_%D0%BA%D0%BD%D0%B8%D0%B6%D0%BD%D1%8B%D0%B9_%D0%BA%D0%BB%D1%83%D0%B1)"), 
-                        "и ничего не упустить",
+                        "Это бот поможешь читать книги из списка Норвежского клуба и следить за своим прогрессом чтения.",
                         "\n", "\n",
-                        "Для просмотра списка доступных команд используйте команду /help").as_kwargs()
-    HelpCommand = """Для повторного вызова начального сообщения используйте команду /start. Для просмотра всего списка команд
-используйте кнопку Меню слева от поля ввода сообщения"""
+                        "Здесь ты можешь:",
+                        "\n",
+                        "📚 посмотреть какие книги есть в списке",
+                        "\n",
+                        "✅ отмечать прочитанные и выбирать следующую случайно",
+                        "\n",
+                        "📊 отслеживать свой прогресс",
+                        "\n", "\n",
+                        "Начни с выбора книги или отметь уже прочитанные.",
+                        "\n", "\n",
+                        "👇 Выбери действие:").as_kwargs()
+    HelpCommand = """Если хочешь вернуться в главное меню, отправь команду /start.
+Полный список команд можно открыть через кнопку Меню слева от поля ввода."""
     UnknownCommand = Text("❌", Bold("Я не знаю такой команды")).as_kwargs()
     InternalError = Text("❌", Bold("Внутренняя ошибка")).as_kwargs()
     BackPagination = "⏪"
@@ -29,23 +37,38 @@ class LexiconRu:
     
     @staticmethod
     def build_profile_text(profile: Profile) -> dict[str, Any]:
-        return Text("📊",
-                    Bold("Профиль"),
+        read_count = len(profile.total_readed_books)
+        unread_count = len(profile.total_unreaded_books)
+        total = read_count + unread_count
+        percent = int((read_count / total * 100)) if total else 0
+        bar_length = 20
+        filled = round(percent / 100 * bar_length)
+        progress_bar = "█" * filled + "░" * (bar_length - filled)
+        return Text("👤 ",
+                    Bold("Твой профиль"),
                     "\n", "\n",
-                    f"Прочитано: {len(profile.total_readed_books)}",
+                    f"📚 Прочитано: {read_count}",
                     "\n",
-                    f"Осталость прочитать: {len(profile.total_unreaded_books)}",
+                    f"📖 Осталось: {unread_count}",
                     "\n",
-                    f"Процент завершения: {int((len(profile.total_readed_books) / len(profile.total_unreaded_books)) * 100)}%").as_kwargs()
+                    f"📊 Прогресс: {percent}%",
+                    "\n", "\n",
+                    progress_bar,
+                    " ",
+                    f"{percent}%",
+                    "\n", "\n",
+                    "Продолжай читать - ты на отличном пути 🚀").as_kwargs()
         
     @staticmethod
     def build_random_book_text(book: Book) -> dict[str, Any]:
-        return Text("🎲",
-                    Bold("Случайная книга"),
+        return Text("📚 ",
+                    Bold("Не знаешь, что читать дальше?"),
                     "\n", "\n",
-                    f"Книга: {book.title}",
-                    "\n",
-                    f"Автор: {book.author}").as_kwargs()
+                    "Попробуй эту книгу:",
+                    "\n", "\n",
+                    f"«{book.title}» — {book.author}",
+                    "\n", "\n",
+                    "Она может тебя удивить 😉").as_kwargs()
 
 @dataclass
 class Command:
