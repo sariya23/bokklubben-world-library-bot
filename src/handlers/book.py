@@ -82,11 +82,16 @@ def create_router(book_service: BookService) -> Router:
     
     async def _reply_mark_readed_page(callback: CallbackQuery, page: int):
         books = await book_service.get_all_books()
+        readed = await book_service.get_readed_books(callback.from_user.id)
         total_pages = _total_pages_mark_readed_books(len(books))
         page = max(0, min(page, total_pages - 1))
         chunk = _page_slice_mark_readed_books(books, page)
         keyboard = generate_mark_readed_books_keyboard(
-            chunk, current_page=page, total_pages=total_pages, total_elements=len(books)
+            chunk,
+            current_page=page,
+            total_pages=total_pages,
+            total_elements=len(books),
+            readed_book_ids=readed.ids,
         )
         try:
             await callback.message.edit_text(**LexiconRu.MarkAlreadyReaded, reply_markup=keyboard)
@@ -124,7 +129,7 @@ def create_router(book_service: BookService) -> Router:
         user_id = callback.from_user.id
         await book_service.mark_readed_book(book_id, user_id)
         await _reply_mark_readed_page(callback, page)
-        await callback.answer(LexiconRu.BookMarkedAsReaded)
+        await callback.answer()
 
 
     return router

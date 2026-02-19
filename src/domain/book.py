@@ -11,5 +11,5 @@ class Book:
     
 class BookList(UserList):
     @property
-    def book_ids(self) -> list[int]:
+    def ids(self) -> list[int]:
         return [book.id for book in self]
