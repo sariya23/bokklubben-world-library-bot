@@ -57,7 +57,7 @@ def create_router(profile_service: ProfileService) -> Router:
             as_marked_section(
                 Bold("📚", "Список прочитанных книг\n"),
                 *elements,
-                marker="📕",
+                marker="📗",
             )
         )
         keyboard = create_pagination_profile_readed_book_keyboard(page, total_pages, PAGE_SIZE_PROFILE_READED_BOOKS * page, len(profile.total_readed_books))
