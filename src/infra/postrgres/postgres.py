@@ -83,7 +83,9 @@ class Postgres:
     def _get_all_books_user_readed_sync(self, user_id: int) -> BookList:
         with self._cursor() as cur:
             cur.execute(
-                "select book_user_readed.book_id, book.title, book.author_full_name, book.country, book.century from book_user_readed join book on book_user_readed.book_id = book.id where user_id = %s",
+                """select book_user_readed.book_id, book.title, book.author_full_name, 
+                book.country, book.century from book_user_readed join book on 
+                book_user_readed.book_id = book.id where user_id = %s order by book.title""",
                 (user_id,),
             )
             rows = cur.fetchall()
