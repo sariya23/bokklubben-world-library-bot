@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 from src.keyboards.menu_commands import set_main_menu
 from src.handlers import book
 from src.service.book.book import BookService
+from src.infra.postrgres.postgres import Postgres
 
 import logging
 import asyncio
@@ -24,9 +25,9 @@ async def main():
     
     bot = Bot(token=config.bot.bot_token)
     disp = Dispatcher()
+    db = Postgres(config.db)
     
-    book_service = BookService()
-    
+    book_service = BookService(db)
     user_router = user.create_router()
     other_router = other.create_router()
     book_router = book.create_router(book_service)

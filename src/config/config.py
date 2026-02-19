@@ -11,7 +11,8 @@ class DbConfig:
     db_username: str
     db_password: str
     db_host: str
-    db_use_ssl: bool
+    db_port: int
+    db_use_ssl: str
 
 @dataclass
 class EnvConfig:
@@ -38,7 +39,8 @@ def create_config(config_path: str) -> Config:
             db_username=env.str("DB_USERNAME"),
             db_password=env.str("DB_PASSWORD"),
             db_host=env.str("DB_HOST"),
-            db_use_ssl=env.bool("DB_USE_SSL"),
+            db_port=env.int("DB_PORT"),
+            db_use_ssl=env.str("DB_USE_SSL"),
         ),
         env_type=EnvConfig(
             env_type=env.str("ENV_TYPE"),

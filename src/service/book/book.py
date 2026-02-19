@@ -1,5 +1,14 @@
 from src.domain.book import Book
+from typing import Protocol
+
+class BookRepository(Protocol):
+    async def get_all_books(self) -> list[Book]:
+        pass
 
 class BookService:
+    
+    def __init__(self, book_repo: BookRepository):
+        self.book_repo = book_repo
+        
     async def get_all_books(self) -> list[Book]:
-        return [Book(id=1, title="asd", author="qwe") for _ in range(100)]
+        return await self.book_repo.get_all_books()

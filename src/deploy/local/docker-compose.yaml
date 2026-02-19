@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16
+    restart: "always"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USERNAME} -d ${DB_NAME} -p ${DB_PORT}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: -p ${DB_PORT}
+    networks:
+      - tg_bot_network
+
+networks:
+  tg_bot_network:
+    external: true
