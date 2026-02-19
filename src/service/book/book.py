@@ -12,3 +12,6 @@ class BookService:
         
     async def get_all_books(self) -> list[Book]:
         return await self.book_repo.get_all_books()
+    
+    async def mark_readed_book(self, book_id: int):
+        print(book_id)

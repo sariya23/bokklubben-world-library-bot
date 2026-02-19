@@ -22,7 +22,7 @@ def generate_mark_readed_books_keyboard(
         builder.row(
             InlineKeyboardButton(
                 text=f"{book.title} - {book.author}",
-                callback_data=f"mark_readed_book:{book.id}",
+                callback_data=f"mark_readed_book:{book.id}:{current_page}",
             )
         )
     nav_buttons = []

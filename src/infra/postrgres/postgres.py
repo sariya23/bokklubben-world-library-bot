@@ -50,7 +50,7 @@ class Postgres:
     def _get_books_sync(self) -> list[Book]:
         with self._cursor() as cur:
             cur.execute(
-                "SELECT id, title, author_full_name, country, century FROM book ORDER BY id"
+                "SELECT id, title, author_full_name, country, century FROM book ORDER BY title"
             )
             rows = cur.fetchall()
         return [

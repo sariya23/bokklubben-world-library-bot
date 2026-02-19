@@ -13,12 +13,15 @@ from aiogram import Router
 from aiogram.utils.formatting import Bold, as_list, as_marked_section
 from aiogram import F
 from aiogram.types import CallbackQuery
+from aiogram.exceptions import TelegramBadRequest
 from src.domain.book import Book
 from src.constants import PAGE_SIZE_SHOW_ALL_BOOKS, PAGE_SIZE_MARK_READED
 
 
 class BookService(Protocol):
     async def get_all_books(self) -> list[Book]:
+        pass
+    async def mark_readed_book(self, book_id: int):
         pass
 
 
@@ -82,12 +85,16 @@ def create_router(book_service: BookService) -> Router:
         keyboard = generate_mark_readed_books_keyboard(
             chunk, current_page=page, total_pages=total_pages, total_elements=len(books)
         )
-        await callback.message.edit_text(**LexiconRu.MarkAlreadyReaded, reply_markup=keyboard)
-        await callback.answer()
+        try:
+            await callback.message.edit_text(**LexiconRu.MarkAlreadyReaded, reply_markup=keyboard)
+        except TelegramBadRequest as e:
+            if "message is not modified" not in str(e):
+                raise
 
     @router.callback_query(F.data == KeyboardButton.MarkAlreadyReaded)
     async def process_mark_already_readed(callback: CallbackQuery):
         await _reply_mark_readed_page(callback, 0)
+        await callback.answer()
 
     @router.callback_query(F.data.startswith(MARK_READED_PAGE_PREFIX))
     async def process_mark_readed_page(callback: CallbackQuery):
@@ -97,12 +104,22 @@ def create_router(book_service: BookService) -> Router:
             await callback.answer()
             return
         await _reply_mark_readed_page(callback, page)
-    
+        await callback.answer()
+
     @router.callback_query(F.data.startswith("mark_readed_book:"))
     async def process_mark_readed_book(callback: CallbackQuery):
-        book_id = int(callback.data.removeprefix("mark_readed_book:"))
+        parts = callback.data.removeprefix("mark_readed_book:").split(":")
+        if len(parts) < 2:
+            await callback.answer()
+            return
+        try:
+            book_id = int(parts[0])
+            page = int(parts[1])
+        except ValueError:
+            await callback.answer()
+            return
         await book_service.mark_readed_book(book_id)
-        await callback.message.edit_text(**LexiconRu.BookMarkedAsReaded)
-        await callback.answer()
+        await _reply_mark_readed_page(callback, page)
+        await callback.answer(LexiconRu.BookMarkedAsReaded)
 
     return router
