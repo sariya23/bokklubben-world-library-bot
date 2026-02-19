@@ -11,7 +11,7 @@ def create_router() -> Router:
     
     @router.message(CommandStart())
     async def process_start_command(message: Message):
-        await message.answer(**LexiconRu.StartCommand, link_preview_options=LinkPreviewOptions(is_disabled=True), reply_markup=keyboard_main)
+        await message.answer(**LexiconRu.StartCommand, link_preview_options=LinkPreviewOptions(is_disabled=True), reply_markup=keyboard_main.as_markup())
         
     @router.message(Command(commands="help"))
     async def process_help_command(message: Message):

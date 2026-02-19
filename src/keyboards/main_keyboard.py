@@ -1,23 +1,29 @@
 from aiogram.types import (
     InlineKeyboardButton,
-    InlineKeyboardMarkup,
 )
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 class KeyboardButton:
     ShowAllBookList = "show_all_book_list"
     MarkAlreadyReaded = "mark_already_readed"
+    Profile = "profile"
 
 
 button_show_all_book_list = InlineKeyboardButton(
-    text="Книги Всемирной библиотеки",
+    text="📚 Книги Всемирной библиотеки",
     callback_data=KeyboardButton.ShowAllBookList
 )
 
 button_mark_already_readed = InlineKeyboardButton(
-    text="Отметить прочитанные книги",
+    text="📋 Отметить прочитанные книги",
     callback_data=KeyboardButton.MarkAlreadyReaded
 )
 
-keyboard_main = InlineKeyboardMarkup(
-    inline_keyboard=[[button_show_all_book_list, button_mark_already_readed]]
+button_profile = InlineKeyboardButton(
+    text="🙍‍♂️ Профиль",
+    callback_data=KeyboardButton.Profile
 )
+
+keyboard_main = InlineKeyboardBuilder()
+keyboard_main.row(button_show_all_book_list, button_mark_already_readed)
+keyboard_main.row(button_profile)

@@ -1,5 +1,7 @@
 from aiogram.utils.formatting import Bold, Text, TextLink
 from dataclasses import dataclass
+from typing import Any
+from src.domain.profile import Profile
 
 class LexiconRu:
     StartCommand = Text("📚",
@@ -24,6 +26,19 @@ class LexiconRu:
                         "Выберите книгу, чтобы отметить ее как прочитанную",
                         "\n", "\n",
                         "Прочитанные книги будут исключены из случайного выбора. Чтобы вернуть книгу в пул нажмите на соответсвующую кнопку еще раз").as_kwargs()
+    
+    @staticmethod
+    def build_profile_text(profile: Profile) -> dict[str, Any]:
+        return Text("📊",
+                    Bold("Профиль"),
+                    "\n", "\n",
+                    f"Прочитано: {len(profile.total_readed_books)}",
+                    "\n",
+                    f"Осталость прочитать: {len(profile.total_unreaded_books)}",
+                    "\n",
+                    f"Процент завершения: {(len(profile.total_readed_books) / len(profile.total_unreaded_books)) * 100}%").as_kwargs()
+        
+        
 
 @dataclass
 class Command:

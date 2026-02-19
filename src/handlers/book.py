@@ -21,9 +21,12 @@ from src.constants import PAGE_SIZE_SHOW_ALL_BOOKS, PAGE_SIZE_MARK_READED
 class BookService(Protocol):
     async def get_all_books(self) -> list[Book]:
         pass
+    
     async def mark_readed_book(self, book_id: int):
         pass
-
+    
+    async def get_readed_books(self, user_id: int) -> list[Book]:
+        pass
 
 def _total_pages_show_all_books(total: int) -> int:
     return max(1, (total + PAGE_SIZE_SHOW_ALL_BOOKS - 1) // PAGE_SIZE_SHOW_ALL_BOOKS)
@@ -122,5 +125,6 @@ def create_router(book_service: BookService) -> Router:
         await book_service.mark_readed_book(book_id, user_id)
         await _reply_mark_readed_page(callback, page)
         await callback.answer(LexiconRu.BookMarkedAsReaded)
+
 
     return router

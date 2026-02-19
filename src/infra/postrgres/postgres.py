@@ -6,7 +6,7 @@ from psycopg2 import pool
 from psycopg2.extensions import connection as PgConnection, cursor as PgCursor
 
 from src.config.config import DbConfig
-from src.domain.book import Book
+from src.domain.book import Book, BookList
 from src.service import error as srv_error
 from psycopg2 import errors
 
@@ -48,22 +48,16 @@ class Postgres:
             finally:
                 cur.close()
 
-    def _get_books_sync(self) -> list[Book]:
+    def _get_books_sync(self) -> BookList:
         with self._cursor() as cur:
             cur.execute(
                 "SELECT id, title, author_full_name, country, century FROM book ORDER BY title"
             )
             rows = cur.fetchall()
-        return [
-            Book(
-                id=int(row[0]),
-                title=str(row[1]),
-                author=str(row[2]),
-                country=str(row[3]),
-                century=int(row[4]),
-            )
+        return BookList(
+            Book(id=int(row[0]), title=str(row[1]), author=str(row[2]), country=str(row[3]), century=int(row[4]))
             for row in rows
-        ]
+        )
 
     async def get_all_books(self) -> list[Book]:
         """Асинхронно возвращает список всех книг (не блокирует event loop)."""
@@ -86,12 +80,23 @@ class Postgres:
                 (book_id, user_id),
             )
     
+    def _get_all_books_user_readed_sync(self, user_id: int) -> BookList:
+        with self._cursor() as cur:
+            cur.execute(
+                "select book_user_readed.book_id, book.title, book.author_full_name, book.country, book.century from book_user_readed join book on book_user_readed.book_id = book.id where user_id = %s",
+                (user_id,),
+            )
+            rows = cur.fetchall()
+        return BookList(Book(id=int(row[0]), title=str(row[1]), author=str(row[2]), country=str(row[3]), century=int(row[4])) for row in rows)
+    
     async def add_book_user_readed(self, book_id: int, user_id: int):
         return await asyncio.to_thread(self._add_book_user_readed_sync, book_id, user_id)
     
     async def remove_book_user_readed(self, book_id: int, user_id: int):
         return await asyncio.to_thread(self._remove_book_user_readed_sync, book_id, user_id)
     
+    async def get_all_books_user_readed(self, user_id: int) -> BookList:
+        return await asyncio.to_thread(self._get_all_books_user_readed_sync, user_id)
         
 
     def close(self) -> None:

@@ -5,6 +5,8 @@ from aiogram import Bot, Dispatcher
 from src.keyboards.menu_commands import set_main_menu
 from src.handlers import book
 from src.service.book.book import BookService
+from src.handlers import profile
+from src.service.profile.profle import ProfileService
 from src.infra.postrgres.postgres import Postgres
 
 import logging
@@ -28,6 +30,9 @@ async def main():
     db = Postgres(config.db)
     
     book_service = BookService(db, db)
+    profile_service = ProfileService(db, db)
+    
+    profile_router = profile.create_router(profile_service)
     user_router = user.create_router()
     other_router = other.create_router()
     book_router = book.create_router(book_service)
@@ -39,6 +44,7 @@ async def main():
     disp.include_router(other_router)
     disp.include_router(book_router)
     disp.include_router(base_router)
+    disp.include_router(profile_router)
     
     await bot.delete_webhook(drop_pending_updates=True)
     await disp.start_polling(bot)

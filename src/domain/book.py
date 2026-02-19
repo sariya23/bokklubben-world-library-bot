@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from collections import UserList
 
 @dataclass
 class Book:
@@ -7,3 +8,8 @@ class Book:
     author: str
     country: str
     century: int
+    
+class BookList(UserList):
+    @property
+    def book_ids(self) -> list[int]:
+        return [book.id for book in self]
