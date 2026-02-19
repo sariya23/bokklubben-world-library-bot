@@ -1,4 +1,4 @@
-from src.domain.book import Book, BookList
+from src.domain.book import BookList
 from typing import Protocol
 from src.service import error
 

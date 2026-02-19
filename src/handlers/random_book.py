@@ -1,4 +1,3 @@
-from aiogram.types import Message
 from typing import Protocol
 from random import choice
 
