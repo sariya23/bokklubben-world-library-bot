@@ -13,7 +13,7 @@ def create_router() -> Router:
     
     @router.callback_query(F.data == KeyboardButtonBase.ToMenu)
     async def process_to_menu(callback: CallbackQuery):
-        await callback.message.edit_text(**LexiconRu.StartCommand, link_preview_options=LinkPreviewOptions(is_disabled=True), reply_markup=keyboard_main)
+        await callback.message.edit_text(**LexiconRu.StartCommand, link_preview_options=LinkPreviewOptions(is_disabled=True), reply_markup=keyboard_main.as_markup())
     
         
     @router.callback_query(F.data == KeyboardButtonBase.Stub)

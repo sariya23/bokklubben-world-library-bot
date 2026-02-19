@@ -2,15 +2,12 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from src.lexicon.lexicon import LexiconRu
 from src.keyboards.keyboard import KeyboardButtonBase
-from src.constants import PAGE_SIZE_SHOW_ALL_BOOKS
+from src.constants import PAGE_SIZE_PROFILE_READED_BOOKS
+from src.keyboards.main_keyboard import button_profile
 
-BOOK_PAGE_PREFIX = "book_page:"
+PROFILE_READED_BOOK_PAGE_PREFIX = "profile_readed_book_page:"
 
-
-def create_pagination_book_keyboard(current_page: int, total_pages: int, curreny_elemnts: int, total_elements: int) -> InlineKeyboardMarkup:
-    """
-    Создаёт inline-кнопки для пагинации списка книг: << >> и В меню.
-    """
+def create_pagination_profile_readed_book_keyboard(current_page: int, total_pages: int, curreny_elemnts: int, total_elements: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     buttons = []
 
@@ -18,14 +15,14 @@ def create_pagination_book_keyboard(current_page: int, total_pages: int, curreny
         buttons.append(
             InlineKeyboardButton(
                 text=LexiconRu.BackPagination,
-                callback_data=f"{BOOK_PAGE_PREFIX}{current_page - 1}",
+                callback_data=f"{PROFILE_READED_BOOK_PAGE_PREFIX}{current_page - 1}",
             ),
         )
     if current_page < total_pages - 1:
         buttons.append(
             InlineKeyboardButton(
                 text=LexiconRu.ForwardPagination,
-                callback_data=f"{BOOK_PAGE_PREFIX}{current_page + 1}",
+                callback_data=f"{PROFILE_READED_BOOK_PAGE_PREFIX}{current_page + 1}",
             )
         )
     if buttons:
@@ -33,14 +30,11 @@ def create_pagination_book_keyboard(current_page: int, total_pages: int, curreny
         
     builder.row(
         InlineKeyboardButton(
-            text=f"{min(curreny_elemnts + PAGE_SIZE_SHOW_ALL_BOOKS, total_elements)}/{total_elements}", 
+            text=f"{min(curreny_elemnts + PAGE_SIZE_PROFILE_READED_BOOKS, total_elements)}/{total_elements}", 
             callback_data=KeyboardButtonBase.Stub),
     )
     
     builder.row(
-        InlineKeyboardButton(
-            text=LexiconRu.ToMenuButton,
-            callback_data=KeyboardButtonBase.ToMenu,
-        )
+        button_profile
     )
     return builder.as_markup()
