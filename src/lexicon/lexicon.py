@@ -2,7 +2,6 @@ from aiogram.utils.formatting import Bold, Text, TextLink
 from dataclasses import dataclass
 from typing import Any
 from src.domain.profile import Profile
-
 class LexiconRu:
     StartCommand = Text("📚",
                         Bold('Всемирная библиотека'),
@@ -36,7 +35,7 @@ class LexiconRu:
                     "\n",
                     f"Осталость прочитать: {len(profile.total_unreaded_books)}",
                     "\n",
-                    f"Процент завершения: {(len(profile.total_readed_books) / len(profile.total_unreaded_books)) * 100}%").as_kwargs()
+                    f"Процент завершения: {int((len(profile.total_readed_books) / len(profile.total_unreaded_books)) * 100)}%").as_kwargs()
         
         
 
