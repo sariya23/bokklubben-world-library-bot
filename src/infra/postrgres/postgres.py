@@ -7,7 +7,8 @@ from psycopg2.extensions import connection as PgConnection, cursor as PgCursor
 
 from src.config.config import DbConfig
 from src.domain.book import Book
-
+from src.service import error as srv_error
+from psycopg2 import errors
 
 class Postgres:
     """Слой для работы с PostgreSQL. В __init__ создаётся пул соединений."""
@@ -67,6 +68,31 @@ class Postgres:
     async def get_all_books(self) -> list[Book]:
         """Асинхронно возвращает список всех книг (не блокирует event loop)."""
         return await asyncio.to_thread(self._get_books_sync)
+
+    def _add_book_user_readed_sync(self, book_id: int, user_id: int):
+        try:
+            with self._cursor() as cur:
+                cur.execute(
+                    "insert into book_user_readed (book_id, user_id) values (%s, %s)",
+                    (book_id, user_id),
+                )
+        except errors.UniqueViolation:
+            raise srv_error.UserAlredyReadedBookError
+
+    def _remove_book_user_readed_sync(self, book_id: int, user_id: int):
+        with self._cursor() as cur:
+            cur.execute(
+                "delete from book_user_readed WHERE book_id = %s and user_id = %s",
+                (book_id, user_id),
+            )
+    
+    async def add_book_user_readed(self, book_id: int, user_id: int):
+        return await asyncio.to_thread(self._add_book_user_readed_sync, book_id, user_id)
+    
+    async def remove_book_user_readed(self, book_id: int, user_id: int):
+        return await asyncio.to_thread(self._remove_book_user_readed_sync, book_id, user_id)
+    
+        
 
     def close(self) -> None:
         if self._pool:

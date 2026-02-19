@@ -27,7 +27,7 @@ async def main():
     disp = Dispatcher()
     db = Postgres(config.db)
     
-    book_service = BookService(db)
+    book_service = BookService(db, db)
     user_router = user.create_router()
     other_router = other.create_router()
     book_router = book.create_router(book_service)

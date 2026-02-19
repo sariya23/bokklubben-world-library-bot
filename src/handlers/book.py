@@ -118,7 +118,8 @@ def create_router(book_service: BookService) -> Router:
         except ValueError:
             await callback.answer()
             return
-        await book_service.mark_readed_book(book_id)
+        user_id = callback.from_user.id
+        await book_service.mark_readed_book(book_id, user_id)
         await _reply_mark_readed_page(callback, page)
         await callback.answer(LexiconRu.BookMarkedAsReaded)
 
