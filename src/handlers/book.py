@@ -3,13 +3,18 @@ from src.keyboards.all_book_list_keyboard import (
     create_pagination_book_keyboard,
     BOOK_PAGE_PREFIX,
 )
+from src.keyboards.mark_readed_books_keyboard import (
+    generate_mark_readed_books_keyboard,
+    MARK_READED_PAGE_PREFIX,
+)
+from src.lexicon.lexicon import LexiconRu
 from typing import Protocol
 from aiogram import Router
 from aiogram.utils.formatting import Bold, as_list, as_marked_section
 from aiogram import F
 from aiogram.types import CallbackQuery
 from src.domain.book import Book
-from src.constants import PAGE_SIZE_SHOW_ALL_BOOKS
+from src.constants import PAGE_SIZE_SHOW_ALL_BOOKS, PAGE_SIZE_MARK_READED
 
 
 class BookService(Protocol):
@@ -17,13 +22,20 @@ class BookService(Protocol):
         pass
 
 
-def _total_pages(total: int) -> int:
+def _total_pages_show_all_books(total: int) -> int:
     return max(1, (total + PAGE_SIZE_SHOW_ALL_BOOKS - 1) // PAGE_SIZE_SHOW_ALL_BOOKS)
 
+def _total_pages_mark_readed_books(total: int) -> int:
+    return max(1, (total + PAGE_SIZE_MARK_READED - 1) // PAGE_SIZE_MARK_READED)
 
-def _page_slice(books: list[Book], page: int) -> list[Book]:
+
+def _page_slice_show_all_books(books: list[Book], page: int) -> list[Book]:
     start = page * PAGE_SIZE_SHOW_ALL_BOOKS
     return books[start : start + PAGE_SIZE_SHOW_ALL_BOOKS]
+
+def _page_slice_mark_readed_books(books: list[Book], page: int) -> list[Book]:
+    start = page * PAGE_SIZE_MARK_READED
+    return books[start : start + PAGE_SIZE_MARK_READED]
 
 
 def create_router(book_service: BookService) -> Router:
@@ -31,9 +43,9 @@ def create_router(book_service: BookService) -> Router:
 
     async def _reply_book_page(callback: CallbackQuery, page: int):
         books = await book_service.get_all_books()
-        total_pages = _total_pages(len(books))
+        total_pages = _total_pages_show_all_books(len(books))
         page = max(0, min(page, total_pages - 1))
-        chunk = _page_slice(books, page)
+        chunk = _page_slice_show_all_books(books, page)
         elements = [f"{book.author} — {book.title}" for book in chunk]
         content = as_list(
             as_marked_section(
@@ -61,5 +73,36 @@ def create_router(book_service: BookService) -> Router:
             await callback.answer()
             return
         await _reply_book_page(callback, page)
+    
+    async def _reply_mark_readed_page(callback: CallbackQuery, page: int):
+        books = await book_service.get_all_books()
+        total_pages = _total_pages_mark_readed_books(len(books))
+        page = max(0, min(page, total_pages - 1))
+        chunk = _page_slice_mark_readed_books(books, page)
+        keyboard = generate_mark_readed_books_keyboard(
+            chunk, current_page=page, total_pages=total_pages, total_elements=len(books)
+        )
+        await callback.message.edit_text(**LexiconRu.MarkAlreadyReaded, reply_markup=keyboard)
+        await callback.answer()
+
+    @router.callback_query(F.data == KeyboardButton.MarkAlreadyReaded)
+    async def process_mark_already_readed(callback: CallbackQuery):
+        await _reply_mark_readed_page(callback, 0)
+
+    @router.callback_query(F.data.startswith(MARK_READED_PAGE_PREFIX))
+    async def process_mark_readed_page(callback: CallbackQuery):
+        try:
+            page = int(callback.data.removeprefix(MARK_READED_PAGE_PREFIX))
+        except ValueError:
+            await callback.answer()
+            return
+        await _reply_mark_readed_page(callback, page)
+    
+    @router.callback_query(F.data.startswith("mark_readed_book:"))
+    async def process_mark_readed_book(callback: CallbackQuery):
+        book_id = int(callback.data.removeprefix("mark_readed_book:"))
+        await book_service.mark_readed_book(book_id)
+        await callback.message.edit_text(**LexiconRu.BookMarkedAsReaded)
+        await callback.answer()
 
     return router

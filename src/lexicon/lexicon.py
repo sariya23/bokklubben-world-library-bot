@@ -16,7 +16,14 @@ class LexiconRu:
     InternalError = Text("❌", Bold('Внутренняя ошибка')).as_kwargs()
     BackPagination = "⏪"
     ForwardPagination = "⏩"
+    BookMarkedAsReaded = "✅"
     ToMenuButton = "📖 В меню"
+    MarkAlreadyReaded = Text("📚",
+                        Bold('Отметить прочитанные книги'),
+                        "\n", "\n",
+                        "Выберите книгу для отметки как прочитанную",
+                        "\n", "\n",
+                        "Прочитанные книги будут исключены из случайного выбора").as_kwargs()
 
 @dataclass
 class Command:
