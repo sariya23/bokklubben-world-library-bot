@@ -7,6 +7,7 @@ class KeyboardButton:
     ShowAllBookList = "show_all_book_list"
     MarkAlreadyReaded = "mark_already_readed"
     Profile = "profile"
+    RandomBook = "random_book"
 
 
 button_show_all_book_list = InlineKeyboardButton(
@@ -24,6 +25,12 @@ button_profile = InlineKeyboardButton(
     callback_data=KeyboardButton.Profile
 )
 
+button_random_book = InlineKeyboardButton(
+    text="🎲 Случайная книга",
+    callback_data=KeyboardButton.RandomBook
+)
+
 keyboard_main = InlineKeyboardBuilder()
 keyboard_main.row(button_show_all_book_list, button_mark_already_readed)
 keyboard_main.row(button_profile)
+keyboard_main.row(button_random_book)

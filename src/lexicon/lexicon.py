@@ -2,6 +2,7 @@ from aiogram.utils.formatting import Bold, Text, TextLink
 from dataclasses import dataclass
 from typing import Any
 from src.domain.profile import Profile
+from src.domain.book import Book
 class LexiconRu:
     StartCommand = Text("📚",
                         Bold('Всемирная библиотека'),
@@ -37,7 +38,14 @@ class LexiconRu:
                     "\n",
                     f"Процент завершения: {int((len(profile.total_readed_books) / len(profile.total_unreaded_books)) * 100)}%").as_kwargs()
         
-        
+    @staticmethod
+    def build_random_book_text(book: Book) -> dict[str, Any]:
+        return Text("🎲",
+                    Bold("Случайная книга"),
+                    "\n", "\n",
+                    f"Книга: {book.title}",
+                    "\n",
+                    f"Автор: {book.author}").as_kwargs()
 
 @dataclass
 class Command:

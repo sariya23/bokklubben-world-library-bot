@@ -6,6 +6,7 @@ from src.keyboards.menu_commands import set_main_menu
 from src.handlers import book
 from src.service.book.book import BookService
 from src.handlers import profile
+from src.handlers import random_book
 from src.service.profile.profle import ProfileService
 from src.infra.postrgres.postgres import Postgres
 
@@ -37,6 +38,7 @@ async def main():
     other_router = other.create_router()
     book_router = book.create_router(book_service)
     base_router = base.create_router()
+    random_book_router = random_book.create_router(profile_service)
     
     await set_main_menu(bot)
     
@@ -45,6 +47,7 @@ async def main():
     disp.include_router(book_router)
     disp.include_router(base_router)
     disp.include_router(profile_router)
+    disp.include_router(random_book_router)
     
     await bot.delete_webhook(drop_pending_updates=True)
     await disp.start_polling(bot)
