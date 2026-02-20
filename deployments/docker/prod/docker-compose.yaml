@@ -1,0 +1,60 @@
+services:
+  tg_bot_db:
+    image: postgres:16
+    restart: "always"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USERNAME} -d ${DB_NAME} -p ${DB_PORT}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: -p ${DB_PORT}
+    networks:
+      - tg_bot_network
+    volumes:
+      - tg_bot_db_data:/var/lib/postgresql/data
+
+  tg_bot_migrations:
+    image: ${MIGRATOR_IMAGE_NAME}
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: tg_bot_db
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USE_SSL: ${DB_USE_SSL}
+    depends_on:
+      tg_bot_db:
+        condition: service_healthy
+    command: sh -c "until pg_isready -h tg_bot_db -p ${DB_PORT}; do sleep 1; done; make migrate ENV=prod"
+    networks:
+      - tg_bot_network
+    volumes:
+      - ${CONFIG_PATH}:/app/config/prod.env
+
+  tg_bot_app:
+    image: ${APP_IMAGE_NAME}
+    restart: "always"
+    depends_on:
+      tg_bot_db:
+        condition: service_healthy
+    command: python main.py --env-path=/app/config/prod.env
+    networks:
+      - tg_bot_network
+    volumes:
+      - ${CONFIG_PATH}:/app/config/prod.env
+
+networks:
+  tg_bot_network:
+    external: true
+
+volumes:
+  tg_bot_db_data:
+    external: true
