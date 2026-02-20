@@ -1,7 +1,7 @@
 venv
-config/.env.prod
-config/.env.local
-config/.env.dev
+config/prod.env
+config/local.env
+config/dev.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
