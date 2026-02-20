@@ -17,4 +17,4 @@ migrate:
 	?sslmode=$(DB_USE_SSL)" up
 
 infra:
-	docker-compose -f src/deploy/local/docker-compose.yaml --env-file=config/.env.local up -d
+	docker-compose -f ./deploy/local/docker-compose.yaml --env-file=config/.env.local up -d
