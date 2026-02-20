@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram import F
 from aiogram.types import CallbackQuery
-from src.keyboards.profile_keyboard import keyboard_profile
+from src.keyboards.profile_keyboard import create_profile_keyboard
 from src.domain.profile import Profile
 from src.lexicon.lexicon import LexiconRu
 from src.domain.book import BookList
@@ -42,8 +42,11 @@ def create_router(profile_service: ProfileService) -> Router:
     async def process_profile(callback: CallbackQuery):
         profile = await profile_service.get_profile(callback.from_user.id)
         await callback.message.edit_text(**LexiconRu.build_profile_text(
-            profile), 
-            reply_markup=keyboard_profile.as_markup())
+            profile),
+            reply_markup=create_profile_keyboard(
+                len(profile.total_readed_books),
+                len(profile.total_unreaded_books),
+            ))
         await callback.answer()
     
     async def _reply_profile_readed_book_page(callback: CallbackQuery, page: int):
@@ -53,6 +56,9 @@ def create_router(profile_service: ProfileService) -> Router:
         page = max(0, min(page, total_pages - 1))
         chunk = _page_slice_show_profile_readed_books(profile.total_readed_books, page)
         elements = [f"{book.author} — {book.title}" for book in chunk]
+        if not elements:
+            callback.answer()
+            return 
         content = as_list(
             as_marked_section(
                 Bold("📚", "Список прочитанных книг\n"),
@@ -74,6 +80,9 @@ def create_router(profile_service: ProfileService) -> Router:
         page = max(0, min(page, total_pages - 1))
         chunk = _page_slice_show_profile_unreaded_books(profile.total_unreaded_books, page)
         elements = [f"{book.author} — {book.title}" for book in chunk]
+        if not elements:
+            callback.answer()
+            return 
         content = as_list(
             as_marked_section(
                 Bold("📚", "Список непрочитанных книг\n"),
